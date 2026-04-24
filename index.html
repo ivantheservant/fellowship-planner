@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>團契小組週會設計器 · Fellowship Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Noto+Serif+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#efe5cf;
+  --bg-card:#e8dcbe;
+  --paper:#f6ecd5;
+  --ink:#281d14;
+  --ink-soft:#5a4a36;
+  --ink-muted:#8a7759;
+  --accent:#8d2f2a;
+  --accent-dark:#5f1e1b;
+  --accent-soft:#b05450;
+  --amber:#a87818;
+  --amber-soft:#c89a3e;
+  --rule:#c4af85;
+  --rule-light:#d6c59b;
+  --input-bg:#f7eed8;
+  --input-border:#b49a6c;
+  --input-focus:#8d2f2a;
+  --font-display:'Cormorant Garamond','Noto Serif TC',serif;
+  --font-serif:'Noto Serif TC','Cormorant Garamond',serif;
+  --font-italic:'Cormorant Garamond',serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-serif);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.65;
+  font-size:16px;
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at top, rgba(139,47,42,0.04), transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(168,120,24,0.03), transparent 60%);
+}
+
+/* Subtle paper grain */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  pointer-events:none;
+  opacity:0.35;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.15  0 0 0 0 0.1  0 0 0 0 0.05  0 0 0 0.08 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  z-index:1;
+}
+
+.container{
+  max-width:780px;
+  margin:0 auto;
+  padding:48px 28px 120px;
+  position:relative;
+  z-index:2;
+}
+
+/* ======================== HEADER ======================== */
+header{
+  text-align:center;
+  padding:32px 0 48px;
+  border-bottom:1px solid var(--rule);
+  margin-bottom:48px;
+}
+
+.badge{
+  display:inline-block;
+  padding:8px 22px;
+  border:1.5px solid var(--accent);
+  color:var(--accent);
+  font-family:var(--font-italic);
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  margin-bottom:28px;
+}
+
+h1{
+  font-family:var(--font-serif);
+  font-size:clamp(34px,5vw,52px);
+  font-weight:600;
+  margin:0 0 8px;
+  letter-spacing:0.02em;
+  color:var(--ink);
+}
+
+.subtitle{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:clamp(20px,3vw,26px);
+  font-weight:400;
+  color:var(--ink-soft);
+  margin:0 0 20px;
+}
+
+.tagline{
+  font-family:var(--font-serif);
+  font-size:17px;
+  color:var(--accent);
+  margin:0 0 18px;
+  letter-spacing:0.05em;
+}
+
+.credit{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:14px;
+  color:var(--ink-muted);
+  margin:0;
+}
+
+.credit strong{color:var(--ink-soft);font-weight:500;}
+
+/* ======================== INTRO CARD ======================== */
+.intro{
+  background:var(--paper);
+  border:1px solid var(--rule);
+  border-left:3px solid var(--accent);
+  padding:22px 26px;
+  margin-bottom:48px;
+  font-size:15px;
+  color:var(--ink-soft);
+  line-height:1.75;
+}
+.intro h3{
+  margin:0 0 10px;
+  font-family:var(--font-serif);
+  font-size:16px;
+  font-weight:600;
+  color:var(--ink);
+  letter-spacing:0.03em;
+}
+.intro ol{margin:8px 0 0 18px;padding:0;}
+.intro li{margin-bottom:5px;}
+.intro em{font-family:var(--font-italic);font-style:italic;color:var(--accent);}
+
+/* ======================== SECTIONS ======================== */
+.section{
+  margin-bottom:44px;
+  position:relative;
+}
+
+.section-ornament{
+  text-align:center;
+  font-family:var(--font-italic);
+  color:var(--rule);
+  font-size:22px;
+  margin-bottom:6px;
+  letter-spacing:0.8em;
+}
+
+.section-header{
+  margin-bottom:10px;
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.section-num{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:28px;
+  color:var(--accent);
+  font-weight:500;
+  line-height:1;
+}
+.section-title-zh{
+  font-family:var(--font-serif);
+  font-size:24px;
+  font-weight:600;
+  color:var(--ink);
+  letter-spacing:0.04em;
+}
+.section-title-en{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:20px;
+  font-weight:400;
+  color:var(--ink-soft);
+}
+
+.section-desc{
+  font-size:14px;
+  color:var(--ink-muted);
+  margin:0 0 22px;
+  padding-bottom:14px;
+  border-bottom:1px dashed var(--rule);
+}
+.section-desc em{
+  font-family:var(--font-italic);
+  font-style:italic;
+  color:var(--ink-soft);
+}
+
+/* ======================== FORM FIELDS ======================== */
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px 22px;
+  margin-bottom:18px;
+}
+.row.single{grid-template-columns:1fr;}
+.row.triple{grid-template-columns:1fr 1fr 1fr;}
+
+@media (max-width:600px){
+  .row,.row.triple{grid-template-columns:1fr;}
+}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+
+.label{
+  font-family:var(--font-serif);
+  font-size:14px;
+  font-weight:600;
+  color:var(--ink);
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.label-en{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-weight:400;
+  color:var(--ink-muted);
+  font-size:13px;
+}
+.opt-tag{
+  display:inline-block;
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:10px;
+  font-weight:500;
+  color:var(--ink-muted);
+  background:var(--paper);
+  border:1px solid var(--rule);
+  padding:1px 8px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea{
+  font-family:var(--font-serif);
+  font-size:15px;
+  color:var(--ink);
+  background:var(--input-bg);
+  border:1px solid var(--input-border);
+  padding:10px 14px;
+  width:100%;
+  transition:border-color 0.2s,background 0.2s,box-shadow 0.2s;
+  border-radius:0;
+}
+
+textarea{
+  resize:vertical;
+  min-height:70px;
+  line-height:1.6;
+  font-family:var(--font-serif);
+}
+
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--input-focus);
+  background:#fbf5e4;
+  box-shadow:0 0 0 3px rgba(141,47,42,0.08);
+}
+
+input::placeholder,textarea::placeholder{
+  color:var(--ink-muted);
+  font-style:italic;
+  opacity:0.8;
+}
+
+select{
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%238d2f2a' stroke-width='1.5' fill='none'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:40px;
+}
+
+/* Checkbox groups */
+.checkbox-group{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px 14px;
+  margin-top:4px;
+}
+@media (max-width:500px){
+  .checkbox-group{grid-template-columns:1fr;}
+}
+.check-item{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  cursor:pointer;
+  padding:6px 8px;
+  font-size:14px;
+  line-height:1.4;
+  transition:background 0.15s;
+}
+.check-item:hover{background:var(--paper);}
+.check-item input[type="checkbox"]{
+  appearance:none;
+  -webkit-appearance:none;
+  width:14px;
+  height:14px;
+  flex-shrink:0;
+  margin-top:3px;
+  background:var(--input-bg);
+  border:1.5px solid var(--input-border);
+  cursor:pointer;
+  position:relative;
+  transition:background 0.15s,border-color 0.15s;
+}
+.check-item input[type="checkbox"]:checked{
+  background:var(--accent);
+  border-color:var(--accent);
+}
+.check-item input[type="checkbox"]:checked::after{
+  content:'';
+  position:absolute;
+  left:3px;top:0px;
+  width:5px;height:9px;
+  border:solid var(--paper);
+  border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+.check-item .zh{color:var(--ink);}
+.check-item .en{
+  font-family:var(--font-italic);
+  font-style:italic;
+  color:var(--ink-muted);
+  font-size:12px;
+  margin-left:4px;
+}
+
+.sub-group-label{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:13px;
+  color:var(--accent);
+  margin:14px 0 4px;
+  padding-bottom:3px;
+  border-bottom:1px dotted var(--rule);
+  letter-spacing:0.05em;
+}
+
+.help-text{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:12px;
+  color:var(--ink-muted);
+  margin-top:3px;
+}
+
+/* ======================== BUTTON BAR ======================== */
+.actions{
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  margin:52px 0 24px;
+  padding-top:32px;
+  border-top:1px solid var(--rule);
+  flex-wrap:wrap;
+}
+
+.btn{
+  font-family:var(--font-serif);
+  font-size:16px;
+  font-weight:600;
+  padding:13px 32px;
+  border:none;
+  cursor:pointer;
+  letter-spacing:0.08em;
+  transition:all 0.2s;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  border-radius:0;
+}
+.btn-primary{
+  background:var(--accent);
+  color:var(--paper);
+  border:1.5px solid var(--accent);
+}
+.btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark);}
+.btn-secondary{
+  background:transparent;
+  color:var(--ink-soft);
+  border:1.5px solid var(--rule);
+}
+.btn-secondary:hover{background:var(--paper);color:var(--ink);border-color:var(--ink-soft);}
+.btn-en{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-weight:400;
+  font-size:14px;
+  opacity:0.85;
+}
+
+/* ======================== OUTPUT ======================== */
+.output-section{
+  margin-top:40px;
+  display:none;
+  animation:fadeIn 0.5s ease-out;
+}
+.output-section.visible{display:block;}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.output-notice{
+  background:linear-gradient(to right, rgba(168,120,24,0.08), rgba(168,120,24,0.02));
+  border-left:3px solid var(--amber);
+  padding:16px 20px;
+  font-size:14px;
+  line-height:1.75;
+  color:var(--ink-soft);
+  margin-bottom:18px;
+}
+.output-notice strong{color:var(--amber);}
+.output-notice .glyph{
+  display:inline-block;
+  width:18px;
+  text-align:center;
+  color:var(--amber);
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-weight:600;
+  margin-right:4px;
+}
+
+.output-box{
+  background:#fdf8e9;
+  border:1px solid var(--rule);
+  border-top:3px solid var(--accent);
+  padding:24px 26px;
+  font-family:var(--font-mono);
+  font-size:13px;
+  line-height:1.7;
+  color:var(--ink);
+  white-space:pre-wrap;
+  word-wrap:break-word;
+  max-height:520px;
+  overflow-y:auto;
+  position:relative;
+}
+
+.copy-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:14px;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.copy-status{
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:13px;
+  color:var(--ink-muted);
+}
+.copy-status.success{color:#4a6b3a;}
+
+/* ======================== FOOTER ======================== */
+footer{
+  text-align:center;
+  margin-top:56px;
+  padding-top:28px;
+  border-top:1px solid var(--rule);
+  font-family:var(--font-italic);
+  font-style:italic;
+  font-size:13px;
+  color:var(--ink-muted);
+  line-height:1.7;
+}
+footer a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft);}
+footer a:hover{color:var(--accent-dark);}
+
+/* Scrollbar */
+.output-box::-webkit-scrollbar{width:10px;}
+.output-box::-webkit-scrollbar-track{background:var(--paper);}
+.output-box::-webkit-scrollbar-thumb{background:var(--rule);border:2px solid var(--paper);}
+.output-box::-webkit-scrollbar-thumb:hover{background:var(--input-border);}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ========== HEADER ========== -->
+<header>
+  <div class="badge">No-Nonsense Gospel</div>
+  <h1>團契週會設計器</h1>
+  <p class="subtitle">Fellowship Meeting Planner</p>
+  <p class="tagline">「不為完美，只為連結生命。」</p>
+  <p class="credit">A prompt-builder by <strong>串嘴大叔 Ivan</strong></p>
+</header>
+
+<!-- ========== INTRO ========== -->
+<div class="intro">
+  <h3>點用？ <em>How to use</em></h3>
+  <ol>
+    <li>填寫下面嘅表格（越詳細越好，但 <em>可以留空</em>）</li>
+    <li>㩒「生成 Prompt」—— 系統會整合你嘅資料</li>
+    <li>Copy 生成嘅 prompt，貼去你常用嘅 AI（ChatGPT / Claude / Gemini）</li>
+    <li>AI 會先檢查你嘅資料有冇矛盾或遺漏，然後先開始設計活動</li>
+  </ol>
+</div>
+
+<!-- ========== §1 BASIC INFO ========== -->
+<div class="section">
+  <div class="section-ornament">§ &nbsp; §</div>
+  <div class="section-header">
+    <span class="section-num">§1</span>
+    <span class="section-title-zh">基本資料</span>
+    <span class="section-title-en">Basic Info</span>
+  </div>
+  <p class="section-desc">你嘅團契／小組係乜規模？對象係邊啲人？<em>Tell me about your fellowship's scope and audience.</em></p>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">團契/小組名稱 <span class="label-en">Name</span></label>
+      <input type="text" id="name" placeholder="例：青少年團契 / 恩典小組">
+    </div>
+    <div class="field">
+      <label class="label">聚會場合 <span class="label-en">Occasion</span> <span class="opt-tag">Optional</span></label>
+      <input type="text" id="occasion" placeholder="例：平常週五 / 復活節特別聚會">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">對象年齡層 <span class="label-en">Age Range</span></label>
+      <select id="age">
+        <option value="">請選擇 / Please choose</option>
+        <option>兒童 (5-12) · Children</option>
+        <option>少年 (13-17) · Teens</option>
+        <option>青年 (18-25) · Youth</option>
+        <option>職青 (25-40) · Young Professionals</option>
+        <option>成人 (40-60) · Adults</option>
+        <option>長者 (60+) · Seniors</option>
+        <option>混齡 · Mixed Ages</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">屬靈光譜 <span class="label-en">Spiritual Spectrum</span></label>
+      <select id="spiritual">
+        <option value="">請選擇 / Please choose</option>
+        <option>慕道友為主 · Seekers</option>
+        <option>初信為主 · New Believers</option>
+        <option>成熟信徒 · Mature Believers</option>
+        <option>混合 · Mixed</option>
+        <option>領袖訓練 · Leadership Training</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row triple">
+    <div class="field">
+      <label class="label">人數 <span class="label-en">Size</span></label>
+      <select id="size">
+        <option value="">請選擇</option>
+        <option>少於 8 人 · Under 8</option>
+        <option>8-15 人 · Small (8-15)</option>
+        <option>16-30 人 · Medium (16-30)</option>
+        <option>多於 30 人 · Large (30+)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">主要語言 <span class="label-en">Language</span></label>
+      <select id="lang">
+        <option value="">請選擇</option>
+        <option>粵語 · Cantonese</option>
+        <option>普通話 · Mandarin</option>
+        <option>英語 · English</option>
+        <option>雙語 · Bilingual</option>
+        <option>三語 · Trilingual (粵/普/英)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">文化背景 <span class="label-en">Background</span> <span class="opt-tag">Opt</span></label>
+      <select id="culture">
+        <option value="">請選擇</option>
+        <option>香港為主 · HK</option>
+        <option>台灣為主 · Taiwan</option>
+        <option>大陸為主 · Mainland</option>
+        <option>本地華僑 · Local Chinese</option>
+        <option>混合 · Mixed</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ========== §2 TIME & VENUE ========== -->
+<div class="section">
+  <div class="section-ornament">§ &nbsp; §</div>
+  <div class="section-header">
+    <span class="section-num">§2</span>
+    <span class="section-title-zh">時間與場地</span>
+    <span class="section-title-en">Time &amp; Venue</span>
+  </div>
+  <p class="section-desc">聚會時長、場地、預算 —— 幫 AI 設計時把握邊界。<em>Time, venue, and budget anchor the design.</em></p>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">聚會總時長（分鐘） <span class="label-en">Duration (min)</span></label>
+      <input type="number" id="duration" placeholder="例：90" min="15" max="600">
+    </div>
+    <div class="field">
+      <label class="label">場地類型 <span class="label-en">Venue Type</span></label>
+      <select id="venue">
+        <option value="">請選擇</option>
+        <option>教會室內 · Church Indoor</option>
+        <option>家庭 · Home</option>
+        <option>戶外公園 · Outdoor Park</option>
+        <option>戶外營地 · Camping</option>
+        <option>餐廳 · Restaurant</option>
+        <option>線上 Zoom · Online</option>
+        <option>混合實體+線上 · Hybrid</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">場地限制 <span class="label-en">Venue Constraints</span> <span class="opt-tag">Opt</span></label>
+      <input type="text" id="venueNotes" placeholder="例：只可用投影、冇廚房、要自備桌椅">
+    </div>
+    <div class="field">
+      <label class="label">預算範圍 <span class="label-en">Budget</span> <span class="opt-tag">Opt</span></label>
+      <select id="budget">
+        <option value="">請選擇</option>
+        <option>無預算 · None</option>
+        <option>少於 NZD $100</option>
+        <option>NZD $100 - $500</option>
+        <option>多於 NZD $500</option>
+        <option>按需要安排 · Flexible</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ========== §3 ACTIVITY TYPE & THEME ========== -->
+<div class="section">
+  <div class="section-ornament">§ &nbsp; §</div>
+  <div class="section-header">
+    <span class="section-num">§3</span>
+    <span class="section-title-zh">活動類型與主題</span>
+    <span class="section-title-en">Type &amp; Theme</span>
+  </div>
+  <p class="section-desc">今次聚會主要做咩？<em>What's the core activity and theme?</em></p>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">主要類型 <span class="label-en">Primary Type</span></label>
+      <select id="type">
+        <option value="">請選擇</option>
+        <option>查經 · Bible Study</option>
+        <option>主題討論 · Topical Discussion</option>
+        <option>敬拜禱告 · Worship &amp; Prayer</option>
+        <option>見證分享 · Testimony Sharing</option>
+        <option>訓練裝備 · Training</option>
+        <option>交誼活動 · Social/Recreational</option>
+        <option>福音外展 · Evangelistic</option>
+        <option>綜合 · Mixed/Combined</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">節期相關 <span class="label-en">Season</span> <span class="opt-tag">Opt</span></label>
+      <select id="season">
+        <option value="">無 / None</option>
+        <option>將臨期 · Advent</option>
+        <option>聖誕 · Christmas</option>
+        <option>大齋期 · Lent</option>
+        <option>Good Friday</option>
+        <option>復活節 · Easter</option>
+        <option>五旬節 · Pentecost</option>
+        <option>母親節 · Mother's Day</option>
+        <option>父親節 · Father's Day</option>
+        <option>感恩節 · Thanksgiving</option>
+        <option>年終／新年 · Year-end / New Year</option>
+        <option>其他（請喺下面主題寫）· Other</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row single">
+    <div class="field">
+      <label class="label">主題說明 <span class="label-en">Theme Description</span> <span class="opt-tag">Opt</span></label>
+      <input type="text" id="theme" placeholder='例：「饒恕」、「從苦難中認識神」、「職場作鹽作光」'>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">經文基礎 <span class="label-en">Scripture Basis</span> <span class="opt-tag">Opt</span></label>
+      <input type="text" id="scripture" placeholder="例：馬太福音 18:21-35 / 讓 AI 推薦">
+    </div>
+    <div class="field">
+      <label class="label">系列資訊 <span class="label-en">Series Info</span> <span class="opt-tag">Opt</span></label>
+      <input type="text" id="series" placeholder="例：第 3 堂 / 共 6 堂 · 系列名：登山寶訓">
+    </div>
+  </div>
+
+  <div class="row single">
+    <div class="field">
+      <label class="label">教材來源 <span class="label-en">Material Source</span> <span class="opt-tag">Opt</span></label>
+      <input type="text" id="materialSrc" placeholder="例：教會年度主題 / 某本書 / 某講道系列 / 自由發揮">
+    </div>
+  </div>
+</div>
+
+<!-- ========== §4 SPECIAL CONSIDERATIONS ========== -->
+<div class="section">
+  <div class="section-ornament">§ &nbsp; §</div>
+  <div class="section-header">
+    <span class="section-num">§4</span>
+    <span class="section-title-zh">參與者特殊考量</span>
+    <span class="section-title-en">Special Considerations</span>
+  </div>
+  <p class="section-desc">有邊啲肢體需要特別安排？<em>Who needs extra care or planning?</em></p>
+
+  <div class="sub-group-label">身體／生理 · Physical</div>
+  <div class="checkbox-group">
+    <label class="check-item"><input type="checkbox" data-cat="physical" value="有行動不便肢體（輪椅/拐杖）"><span><span class="zh">行動不便</span><span class="en">Mobility</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="physical" value="有聽障肢體（需手語/字幕）"><span><span class="zh">聽障</span><span class="en">Hearing</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="physical" value="有視障肢體"><span><span class="zh">視障</span><span class="en">Vision</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="physical" value="有長者，需慢節奏"><span><span class="zh">長者慢節奏</span><span class="en">Seniors</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="physical" value="有孕婦"><span><span class="zh">孕婦</span><span class="en">Pregnant</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="physical" value="有過敏/飲食限制"><span><span class="zh">過敏/飲食限制</span><span class="en">Allergies</span></span></label>
+  </div>
+
+  <div class="sub-group-label">家庭結構 · Family</div>
+  <div class="checkbox-group">
+    <label class="check-item"><input type="checkbox" data-cat="family" value="有小孩同來，需安排 childcare"><span><span class="zh">小孩需 childcare</span><span class="en">Childcare needed</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="family" value="有小孩同來，要融入活動"><span><span class="zh">小孩要融入活動</span><span class="en">Kids join in</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="family" value="有單親家庭成員"><span><span class="zh">單親家庭</span><span class="en">Single parents</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="family" value="有夫妻/情侶同來"><span><span class="zh">夫妻/情侶同來</span><span class="en">Couples</span></span></label>
+  </div>
+
+  <div class="sub-group-label">屬靈處境 · Spiritual</div>
+  <div class="checkbox-group">
+    <label class="check-item"><input type="checkbox" data-cat="spiritual" value="有慕道友或初次參加者"><span><span class="zh">慕道友/初次參加</span><span class="en">Seekers/first-timers</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="spiritual" value="有剛經歷重大事件者（喪親/失業/患病等）"><span><span class="zh">剛經歷重大事件</span><span class="en">Recent crisis</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="spiritual" value="有跨宗派背景者"><span><span class="zh">跨宗派背景</span><span class="en">Cross-denomination</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="spiritual" value="有對教會有戒心或受過傷害者"><span><span class="zh">對教會有戒心</span><span class="en">Wounded by church</span></span></label>
+  </div>
+
+  <div class="sub-group-label">文化／語言 · Cultural</div>
+  <div class="checkbox-group">
+    <label class="check-item"><input type="checkbox" data-cat="cultural" value="有新移民"><span><span class="zh">新移民</span><span class="en">New immigrants</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="cultural" value="有 ABC/土生華僑，需英文協助"><span><span class="zh">ABC/土生華僑</span><span class="en">ABC / local-born</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="cultural" value="有跨世代溝通議題"><span><span class="zh">跨世代議題</span><span class="en">Generation gap</span></span></label>
+  </div>
+
+  <div class="row single" style="margin-top:22px;">
+    <div class="field">
+      <label class="label">其他特殊考量 <span class="label-en">Other Considerations</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="otherNeeds" placeholder="自由補充：任何以上未涵蓋嘅特殊需要或背景..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ========== §5 INTERACTION DESIGN ========== -->
+<div class="section">
+  <div class="section-ornament">§ &nbsp; §</div>
+  <div class="section-header">
+    <span class="section-num">§5</span>
+    <span class="section-title-zh">互動設計需求</span>
+    <span class="section-title-en">Interaction Design</span>
+  </div>
+  <p class="section-desc">每個環節嘅形式同深度。<em>Format and depth of each segment.</em></p>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">破冰 <span class="label-en">Ice-breaker</span></label>
+      <select id="iceBreaker">
+        <option value="">請選擇</option>
+        <option>不需要 · Skip</option>
+        <option>輕度寒暄就好 · Light chit-chat</option>
+        <option>需要 · 熱鬧歡樂 · Fun &amp; lively</option>
+        <option>需要 · 安靜沉思 · Quiet &amp; reflective</option>
+        <option>需要 · 與主題相關 · Theme-linked</option>
+        <option>需要 · 認識彼此 · Get-to-know</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">分享問題 <span class="label-en">Sharing Questions</span></label>
+      <select id="sharing">
+        <option value="">請選擇</option>
+        <option>不需要 · Skip</option>
+        <option>淺層交誼 · Surface fellowship</option>
+        <option>中等屬靈 · Mid spiritual</option>
+        <option>深度生命 · Deep life sharing</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">討論形式 <span class="label-en">Discussion Style</span></label>
+      <select id="discussion">
+        <option value="">請選擇</option>
+        <option>不需要 · Skip</option>
+        <option>歸納式查經 · Inductive Bible study</option>
+        <option>開放討論 · Open discussion</option>
+        <option>辯論 · Debate format</option>
+        <option>案例分析 · Case study</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">反思 Debriefing <span class="label-en">Debriefing</span></label>
+      <select id="debrief">
+        <option value="">請選擇</option>
+        <option>不需要 · Skip</option>
+        <option>屬靈反思 · Spiritual reflection</option>
+        <option>團隊反思 · Team reflection</option>
+        <option>自我反思 · Self reflection</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">遊戲/活動 <span class="label-en">Games/Activity</span></label>
+      <select id="games">
+        <option value="">請選擇</option>
+        <option>不需要 · Skip</option>
+        <option>合作型 · Cooperative</option>
+        <option>競賽型 · Competitive</option>
+        <option>思考型 · Thinking/puzzle</option>
+        <option>體能型 · Physical</option>
+        <option>創意型 · Creative</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">詩歌敬拜 <span class="label-en">Worship Music</span></label>
+      <select id="worship">
+        <option value="">請選擇</option>
+        <option>不需要 · Skip</option>
+        <option>快詩為主 · Upbeat</option>
+        <option>慢詩為主 · Slow/reflective</option>
+        <option>傳統聖詩 · Traditional hymns</option>
+        <option>現代敬拜 · Contemporary</option>
+        <option>混合 · Mixed</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row single">
+    <div class="field">
+      <label class="label">代禱形式 <span class="label-en">Prayer Format</span></label>
+      <select id="prayer">
+        <option value="">請選擇</option>
+        <option>全體同心 · Corporate united</option>
+        <option>小組代禱 · Small group</option>
+        <option>兩兩代禱 · Paired</option>
+        <option>個人默禱 · Silent individual</option>
+        <option>代禱信 · Written prayer cards</option>
+        <option>混合 · Mixed</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ========== §6 RESOURCES ========== -->
+<div class="section">
+  <div class="section-ornament">§ &nbsp; §</div>
+  <div class="section-header">
+    <span class="section-num">§6</span>
+    <span class="section-title-zh">資源與人力</span>
+    <span class="section-title-en">Resources</span>
+  </div>
+  <p class="section-desc">你嘅同工團隊、設備同物資。<em>Your team, equipment, and supplies.</em></p>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">可用同工人數 <span class="label-en">Staff Count</span> <span class="opt-tag">Opt</span></label>
+      <input type="number" id="staffCount" placeholder="例：3" min="0" max="50">
+    </div>
+    <div class="field">
+      <label class="label">同工角色 <span class="label-en">Staff Roles</span> <span class="opt-tag">Opt</span></label>
+      <input type="text" id="staffRoles" placeholder="例：主席、敬拜帶領、司琴">
+    </div>
+  </div>
+
+  <div class="sub-group-label">可用設備 · Equipment</div>
+  <div class="checkbox-group">
+    <label class="check-item"><input type="checkbox" data-cat="equipment" value="投影機"><span><span class="zh">投影機</span><span class="en">Projector</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="equipment" value="音響/咪"><span><span class="zh">音響/咪</span><span class="en">Sound/Mic</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="equipment" value="樂器（琴/結他）"><span><span class="zh">樂器</span><span class="en">Instruments</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="equipment" value="白板/flipchart"><span><span class="zh">白板</span><span class="en">Whiteboard</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="equipment" value="電視/螢幕"><span><span class="zh">電視/螢幕</span><span class="en">TV/Screen</span></span></label>
+    <label class="check-item"><input type="checkbox" data-cat="equipment" value="茶水/廚房"><span><span class="zh">茶水/廚房</span><span class="en">Kitchen</span></span></label>
+  </div>
+
+  <div class="row single" style="margin-top:20px;">
+    <div class="field">
+      <label class="label">已有物資或特別備注 <span class="label-en">Materials on hand</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="materials" placeholder="例：有上次剩低嘅工藝材料、有小組講義、有咖啡機..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ========== §7 HISTORY CONTEXT ========== -->
+<div class="section">
+  <div class="section-ornament">§ &nbsp; §</div>
+  <div class="section-header">
+    <span class="section-num">§7</span>
+    <span class="section-title-zh">歷史脈絡</span>
+    <span class="section-title-en">History &amp; Context</span>
+  </div>
+  <p class="section-desc">強烈建議填 —— 避免重複、避開地雷、延續節奏。<em>Strongly recommended to avoid repeats and landmines.</em></p>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">團契最近屬靈狀況 <span class="label-en">Recent Spiritual State</span> <span class="opt-tag">Opt</span></label>
+      <select id="spiritualState">
+        <option value="">請選擇</option>
+        <option>熱絡 · Thriving</option>
+        <option>低迷 · Sluggish</option>
+        <option>有紛爭 · Tension/conflict</option>
+        <option>剛復興 · Newly revived</option>
+        <option>轉型中 · In transition</option>
+        <option>穩定 · Steady</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">上次聚會做了什麼 <span class="label-en">Last Meeting</span> <span class="opt-tag">Opt</span></label>
+      <input type="text" id="lastMeeting" placeholder="例：查經約翰福音第3章">
+    </div>
+  </div>
+
+  <div class="row single">
+    <div class="field">
+      <label class="label">近期重大事件 <span class="label-en">Recent Events</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="recentEvents" placeholder="例：有弟兄離世、有姊妹結婚、牧者轉職..."></textarea>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">做過效果好嘅形式 <span class="label-en">What Worked</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="whatWorked" placeholder="例：戶外 BBQ、兩兩分享..."></textarea>
+    </div>
+    <div class="field">
+      <label class="label">做過效果差嘅形式 <span class="label-en">What Didn't</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="whatFailed" placeholder="例：純講道式、太長嘅遊戲..."></textarea>
+    </div>
+  </div>
+
+  <div class="row single">
+    <div class="field">
+      <label class="label">成員忌諱或敏感議題 <span class="label-en">Taboos/Sensitivities</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="taboos" placeholder="例：避免政治話題、有弟兄剛離婚避免婚姻相關分享..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ========== §8 SPECIAL REQUESTS ========== -->
+<div class="section">
+  <div class="section-ornament">§ &nbsp; §</div>
+  <div class="section-header">
+    <span class="section-num">§8</span>
+    <span class="section-title-zh">特別要求與其他</span>
+    <span class="section-title-en">Special Requests &amp; Other</span>
+  </div>
+  <p class="section-desc">任何必須要做、必須避免、或你心目中有嘅畫面。<em>Anything must-have, must-avoid, or the picture you have in mind.</em></p>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">必須包含 <span class="label-en">Must Include</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="mustInclude" placeholder="例：一定要有《主是我力量》、要配合牧師講道..."></textarea>
+    </div>
+    <div class="field">
+      <label class="label">必須避免 <span class="label-en">Must Avoid</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="mustAvoid" placeholder="例：唔要身體接觸遊戲、避免政治議題..."></textarea>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label class="label">創意要求 <span class="label-en">Creative Wish</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="creative" placeholder="例：想有 Kahoot、想有見證環節、想玩 escape room..."></textarea>
+    </div>
+    <div class="field">
+      <label class="label">期待果效 <span class="label-en">Expected Outcome</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="outcome" placeholder="例：希望弟兄姊妹離開時覺得被神觸摸..."></textarea>
+    </div>
+  </div>
+
+  <div class="row single">
+    <div class="field">
+      <label class="label">其他自由輸入 <span class="label-en">Anything Else</span> <span class="opt-tag">Opt</span></label>
+      <textarea id="other" placeholder="任何以上未涵蓋嘅背景、要求、限制..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ACTIONS ========== -->
+<div class="actions">
+  <button class="btn btn-secondary" id="resetBtn">
+    重設 <span class="btn-en">Reset</span>
+  </button>
+  <button class="btn btn-primary" id="generateBtn">
+    生成 Prompt <span class="btn-en">Generate</span>
+  </button>
+</div>
+
+<!-- ========== OUTPUT ========== -->
+<div class="output-section" id="output">
+  <div class="section-header">
+    <span class="section-num">§</span>
+    <span class="section-title-zh">你嘅 Prompt</span>
+    <span class="section-title-en">Your Prompt</span>
+  </div>
+
+  <div class="output-notice">
+    <span class="glyph">✦</span>
+    <strong>點樣用呢個 Prompt？</strong><br>
+    Copy 下面嘅 prompt，然後貼去 <em>ChatGPT / Claude / Gemini / Copilot</em> 任何一個你慣用嘅 AI 對話。如果你有相關相片（例如場地照、人數分佈、上次活動相），同時 upload 俾 AI 睇，佢會一齊處理。AI 會**先檢查資料有冇矛盾**，有問題會問你，冇問題先開始設計。
+  </div>
+
+  <pre class="output-box" id="promptOutput"></pre>
+
+  <div class="copy-bar">
+    <span class="copy-status" id="copyStatus"></span>
+    <button class="btn btn-primary" id="copyBtn" style="padding:10px 24px;font-size:14px;">
+      Copy to Clipboard
+    </button>
+  </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+  <p>
+    A ministry tool by <a href="https://www.youtube.com/@nononsensegospel" target="_blank" rel="noopener">串嘴大叔 Ivan</a><br>
+    此工具免費使用 · 無收集任何資料 · 純前端運作
+  </p>
+  <p style="margin-top:8px;font-size:12px;opacity:0.7;">
+    "So then, we are all his building, and he is the foundation." &mdash; inspired by Eph. 2:19-22
+  </p>
+</footer>
+
+</div>
+
+<script>
+// ============== PROMPT BUILDER ==============
+function getVal(id){
+  const el=document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function getChecked(cat){
+  return Array.from(document.querySelectorAll(`input[data-cat="${cat}"]:checked`))
+    .map(el=>el.value);
+}
+
+function line(label,value){
+  if(!value) return null;
+  return `- **${label}**: ${value}`;
+}
+
+function listSection(title,items){
+  const filtered=items.filter(Boolean);
+  if(filtered.length===0) return '';
+  return `\n### ${title}\n${filtered.join('\n')}`;
+}
+
+function checkList(title,items){
+  if(!items || items.length===0) return '';
+  return `\n**${title}:**\n${items.map(i=>`  - ${i}`).join('\n')}`;
+}
+
+function buildPrompt(){
+  // ===== collect all data =====
+  const d={
+    name:getVal('name'),
+    occasion:getVal('occasion'),
+    age:getVal('age'),
+    spiritual:getVal('spiritual'),
+    size:getVal('size'),
+    lang:getVal('lang'),
+    culture:getVal('culture'),
+    duration:getVal('duration'),
+    venue:getVal('venue'),
+    venueNotes:getVal('venueNotes'),
+    budget:getVal('budget'),
+    type:getVal('type'),
+    season:getVal('season'),
+    theme:getVal('theme'),
+    scripture:getVal('scripture'),
+    series:getVal('series'),
+    materialSrc:getVal('materialSrc'),
+    physical:getChecked('physical'),
+    family:getChecked('family'),
+    spiritualNeeds:getChecked('spiritual'),
+    cultural:getChecked('cultural'),
+    otherNeeds:getVal('otherNeeds'),
+    iceBreaker:getVal('iceBreaker'),
+    sharing:getVal('sharing'),
+    discussion:getVal('discussion'),
+    debrief:getVal('debrief'),
+    games:getVal('games'),
+    worship:getVal('worship'),
+    prayer:getVal('prayer'),
+    staffCount:getVal('staffCount'),
+    staffRoles:getVal('staffRoles'),
+    equipment:getChecked('equipment'),
+    materials:getVal('materials'),
+    spiritualState:getVal('spiritualState'),
+    lastMeeting:getVal('lastMeeting'),
+    recentEvents:getVal('recentEvents'),
+    whatWorked:getVal('whatWorked'),
+    whatFailed:getVal('whatFailed'),
+    taboos:getVal('taboos'),
+    mustInclude:getVal('mustInclude'),
+    mustAvoid:getVal('mustAvoid'),
+    creative:getVal('creative'),
+    outcome:getVal('outcome'),
+    other:getVal('other')
+  };
+
+  // ===== build prompt =====
+  let p=`你係一位資深嘅華人教會團契導師，有 20 年以上牧養各類團契小組嘅經驗，熟悉粵語、普通話、英語三語會眾嘅文化差異。請根據以下資料，為我設計一次完整、可執行嘅團契／小組週會活動計劃。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【第一步：資料檢查】（請先做，唔好跳過）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+喺開始設計之前，請先檢查以下資料：
+
+1. **完整性** — 有冇缺少關鍵資訊？
+2. **合理性** — 時間、人數、場地、對象加埋合唔合邏輯？
+3. **一致性** — 有冇互相矛盾？（例：時間加埋超出總時長、對象與深度不匹配、場地與活動衝突）
+4. **可行性** — 資源、同工、預算能唔能夠支撐呢個設計？
+
+【如果發現以下情況，請停一停，列出問題再問我】：
+
+✦ 缺漏關鍵資訊（例：冇填對象、時長、類型）
+✦ 時間總和 ≠ 總時長
+✦ 人數與活動深度不配（例：30 人做深度生命分享）
+✦ 場地與類型不配（例：戶外 BBQ 要安靜查經）
+✦ 對象屬靈光譜與內容深度不配（例：慕道友為主查希伯來書）
+✦ 戶外活動冇天氣備案
+✦ 有特殊需要但冇對應安排（例：有輪椅但安排遠足）
+✦ 主題太空泛，需要澄清方向
+
+【澄清格式】：
+📋 我注意到以下幾點需要先澄清：
+
+❓ 問題 1：[具體問題]
+   - 觀察：[點解呢度有問題]
+   - 建議選項：A) ... B) ... C) ...
+
+❓ 問題 2：...
+
+請我回覆後，你先開始設計。如果資料完整合理，直接進入第二步。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【團契基本資料】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+
+  // Basic
+  const basic=[
+    line('團契/小組名稱',d.name),
+    line('聚會場合',d.occasion),
+    line('對象年齡層',d.age),
+    line('屬靈光譜',d.spiritual),
+    line('人數規模',d.size),
+    line('主要語言',d.lang),
+    line('文化背景',d.culture)
+  ].filter(Boolean);
+  p+=basic.length?basic.join('\n')+'\n':'（未填 / Not filled）\n';
+
+  // Time & Venue
+  p+=`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【時間與場地】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+  const tv=[
+    line('聚會總時長',d.duration?d.duration+' 分鐘':''),
+    line('場地類型',d.venue),
+    line('場地限制',d.venueNotes),
+    line('預算範圍',d.budget)
+  ].filter(Boolean);
+  p+=tv.length?tv.join('\n')+'\n':'（未填）\n';
+
+  // Activity Type
+  p+=`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【活動類型與主題】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+  const at=[
+    line('主要類型',d.type),
+    line('節期',d.season),
+    line('主題說明',d.theme),
+    line('經文基礎',d.scripture),
+    line('系列資訊',d.series),
+    line('教材來源',d.materialSrc)
+  ].filter(Boolean);
+  p+=at.length?at.join('\n')+'\n':'（未填）\n';
+
+  // Special Considerations
+  p+=`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【參與者特殊考量】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+  const hasAnyNeeds=d.physical.length||d.family.length||d.spiritualNeeds.length||d.cultural.length||d.otherNeeds;
+  if(hasAnyNeeds){
+    p+=checkList('身體／生理',d.physical);
+    p+=checkList('家庭結構',d.family);
+    p+=checkList('屬靈處境',d.spiritualNeeds);
+    p+=checkList('文化／語言',d.cultural);
+    if(d.otherNeeds) p+=`\n**其他補充：** ${d.otherNeeds}`;
+    p+='\n';
+  }else{
+    p+='（冇特殊考量 / None flagged）\n';
+  }
+
+  // Interaction Design
+  p+=`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【互動設計需求】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+  const inter=[
+    line('破冰',d.iceBreaker),
+    line('分享問題',d.sharing),
+    line('討論形式',d.discussion),
+    line('反思 Debriefing',d.debrief),
+    line('遊戲/活動',d.games),
+    line('詩歌敬拜',d.worship),
+    line('代禱形式',d.prayer)
+  ].filter(Boolean);
+  p+=inter.length?inter.join('\n')+'\n':'（請你自行合理配置 / Please decide）\n';
+
+  // Resources
+  p+=`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【資源與人力】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+  const res=[
+    line('可用同工人數',d.staffCount),
+    line('同工角色',d.staffRoles),
+    line('可用設備',d.equipment.join('、')),
+    line('已有物資',d.materials)
+  ].filter(Boolean);
+  p+=res.length?res.join('\n')+'\n':'（未填 / Not filled）\n';
+
+  // History
+  p+=`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【歷史脈絡】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+  const hist=[
+    line('最近屬靈狀況',d.spiritualState),
+    line('上次聚會做了什麼',d.lastMeeting),
+    line('近期重大事件',d.recentEvents),
+    line('做過效果好嘅形式',d.whatWorked),
+    line('做過效果差嘅形式',d.whatFailed),
+    line('成員忌諱或敏感議題',d.taboos)
+  ].filter(Boolean);
+  p+=hist.length?hist.join('\n')+'\n':'（未填）\n';
+
+  // Special Requests
+  p+=`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【特別要求與其他】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+  const sp=[
+    line('必須包含',d.mustInclude),
+    line('必須避免',d.mustAvoid),
+    line('創意要求',d.creative),
+    line('期待果效',d.outcome),
+    line('其他自由輸入',d.other)
+  ].filter(Boolean);
+  p+=sp.length?sp.join('\n')+'\n':'（未填）\n';
+
+  // Output requirements
+  p+=`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【第二步：輸出內容要求】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+請用**繁體中文**輸出以下內容（如主要語言係英語，第 3–8 項可同時用英文）：
+
+1. **活動主題一句話總結**（15 字內，可做海報標語）
+
+2. **設計理念說明**
+   - 點解咁設計？
+   - 針對邊啲特殊需要做咗咩調整？
+   - 預期達到咩果效？
+
+3. **詳細流程表**（用 markdown table）
+   | 時間 | 時長 | 環節 | 內容 | 負責人 | 道具／準備 |
+
+4. **破冰活動**（若需要）
+   - 活動名稱
+   - 規則（寫到小學生都明）
+   - 所需物資
+   - 帶領者口白範例
+   - 與主題嘅連結
+
+5. **敬拜詩歌建議**（3–5 首）
+   - 詩歌名稱 + 語言版本
+   - 順序（快→慢 或 讚美→委身）
+   - 與主題嘅連結
+
+6. **主要內容教材**
+   - 若查經：經文（和合本）、背景、歸納式 3 問（觀察／解釋／應用）
+   - 若主題：核心信息 3 點、聖經依據（和合本）、生活應用
+   - 若活動：步驟分解、屬靈意義、反思方向
+
+7. **分享／討論問題**（按勾選深度，3–5 題）
+   - 問題本身
+   - 設計意圖（點解問呢題）
+   - 預期答案方向
+   - 帶領技巧（遇冷場／失控點算）
+
+8. **代禱方向**（3–5 項）
+   - 具體代禱事項
+   - 經文根據（若適用）
+   - 帶領禱文範例
+
+9. **Debriefing 反思問題**（若需要）
+
+10. **特殊考量嘅具體安排**
+    針對每項勾選嘅特殊需要，俾出具體執行方法：
+    - 例：行動不便者 → 座位、動線設計
+    - 例：戶外 → 天氣備案 A/B/C
+    - 例：慕道友 → 用語、接待、後續跟進
+
+11. **物資清單總表**
+    - 必備 / 建議 / 可選三級
+    - 數量、採購建議、預算估算
+
+12. **同工分工表**
+    角色 / 人名（若知） / 職責 / 準備事項
+
+13. **風險評估與備案**
+    - 可能出狀況嘅位
+    - 每個狀況嘅應對
+    - 緊急聯絡（若戶外）
+
+14. **帶領者提醒**（5 條最關鍵）
+    - 屬靈提醒
+    - 帶領技巧
+    - 人際敏感度
+    - 時間控制
+    - 突發應變
+
+15. **聚會後跟進建議**
+    - 當晚：同工檢討重點
+    - 本週：個別關懷
+    - 下週：延續性活動
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【輸出規則】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ 所有中文聖經引用用【和合本】
+✓ 所有英文聖經引用用【NIV】
+✓ 繁體中文輸出（唔好用簡體字或大陸用語）
+✓ 繁體中文標點符號（「」『』、，。；：？！）
+✓ 避免空泛神學，一切導向可執行
+✓ 考慮華人團契文化（含蓄、面子、關係優先）
+✓ 符合牧養倫理（不操控情緒、不強迫分享、尊重節奏）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【第三步：自我檢核】（輸出完之後做）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+喺最後加一段「設計自我檢核」：
+
+🔍 設計自我檢核
+- 時間總和 = 聚會總時長？[是/否，若否說明]
+- 所有特殊需要都有對應安排？[逐項列出]
+- 預算在範圍內？[估算]
+- 同工人數足夠？[評估]
+- 有咩未決定細節需要使用者再定？[列出]
+- 最大執行風險係咩？[誠實講]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+現在，請先做第一步資料檢查。
+有疑問請問我；資料夠就直接開始設計。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+  return p;
+}
+
+// ============== UI HANDLERS ==============
+document.getElementById('generateBtn').addEventListener('click',()=>{
+  const prompt=buildPrompt();
+  const out=document.getElementById('promptOutput');
+  const section=document.getElementById('output');
+  out.textContent=prompt;
+  section.classList.add('visible');
+  document.getElementById('copyStatus').textContent='';
+  setTimeout(()=>section.scrollIntoView({behavior:'smooth',block:'start'}),80);
+});
+
+document.getElementById('copyBtn').addEventListener('click',async()=>{
+  const text=document.getElementById('promptOutput').textContent;
+  const status=document.getElementById('copyStatus');
+  try{
+    await navigator.clipboard.writeText(text);
+    status.textContent='✓ 已複製到剪貼簿 · Copied to clipboard';
+    status.classList.add('success');
+    setTimeout(()=>{
+      status.textContent='';
+      status.classList.remove('success');
+    },3500);
+  }catch(e){
+    // fallback
+    const ta=document.createElement('textarea');
+    ta.value=text;
+    document.body.appendChild(ta);
+    ta.select();
+    try{document.execCommand('copy');status.textContent='✓ 已複製 · Copied';status.classList.add('success');}
+    catch(e2){status.textContent='✗ 複製失敗，請手動選取 · Please select manually';}
+    document.body.removeChild(ta);
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(!confirm('確定重設全部欄位？ / Reset all fields?')) return;
+  document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(el=>el.value='');
+  document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
+  document.querySelectorAll('input[type="checkbox"]').forEach(el=>el.checked=false);
+  document.getElementById('output').classList.remove('visible');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+</script>
+</body>
+</html>
